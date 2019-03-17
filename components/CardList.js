@@ -74,6 +74,67 @@ export default class CardList extends React.Component {
       this.setState({ time });
     }, 1000);
   }
+  getCharacterName = async characterName => {
+    const soundObject = new Audio.Sound();
+    try {
+      await soundObject.loadAsync(require("../assets/sounds/lightsaber.mp3"));
+      let {
+        inputValue,
+        totalPoints,
+        peopleOpenedDetail,
+        peopleCorrectAnswers
+      } = this.state;
+      console.log(inputValue);
+      console.log(characterName);
+
+      if (
+        inputValue.toLowerCase() === characterName.toLowerCase() &&
+        !peopleCorrectAnswers.includes(characterName)
+      ) {
+        peopleOpenedDetail.includes(characterName)
+          ? (totalPoints += 5)
+          : (totalPoints += 10);
+        peopleCorrectAnswers.push(characterName);
+        this.setState({ totalPoints });
+        this.setState({ peopleCorrectAnswers });
+        await soundObject.playAsync();
+      } else {
+        Alert.alert("Valor incorreto ou resposta já acertada");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  getImage(url) {
+    return `https://starwars-visualguide.com/assets/img/characters/${url
+      .split("/people/")[1]
+      .replace("/", "")}.jpg`;
+  }
+
+  onInputChange = inputValue => {
+    this.setState({ inputValue });
+  };
+
+  chosenCharacterDetails(character) {
+    let { peopleOpenedDetail } = this.state;
+    peopleOpenedDetail.push(character.name);
+    this.setState({ character });
+    this.setState({ peopleOpenedDetail });
+    this.setModalVisible(true);
+  }
+
+  handleLoadMore = async () => {
+    let { page, hasMoreCharacters } = this.state;
+    if (hasMoreCharacters) {
+      page++;
+      this.setState({ page });
+      setTimeout(async () => {
+        await this.getAllCharacters();
+      }, 1000);
+    }
+  };
+
   renderCharacters = () => {
     const { people, totalPoints, time, gameEnded } = this.state;
     return (
@@ -133,67 +194,6 @@ export default class CardList extends React.Component {
         {this.renderModal()}
       </View>
     );
-  };
-  getCharacterName = async characterName => {
-    const soundObject = new Audio.Sound();
-    try {
-      await soundObject.loadAsync(require("../assets/sounds/lightsaber.mp3"));
-      let {
-        inputValue,
-        totalPoints,
-        peopleOpenedDetail,
-        peopleCorrectAnswers
-      } = this.state;
-      console.log(inputValue);
-      console.log(characterName);
-
-      if (
-        inputValue.toLowerCase() === characterName.toLowerCase() &&
-        !peopleCorrectAnswers.includes(characterName)
-      ) {
-        peopleOpenedDetail.includes(characterName)
-          ? (totalPoints += 5)
-          : (totalPoints += 10);
-        peopleCorrectAnswers.push(characterName);
-        this.setState({ totalPoints });
-        this.setState({ peopleCorrectAnswers });
-        await soundObject.playAsync();
-      } else {
-        Alert.alert("Valor incorreto ou resposta já acertada");
-      }
-      // Your sound is playing!
-    } catch (error) {
-      // An error occurred!
-    }
-  };
-
-  getImage(url) {
-    return `https://starwars-visualguide.com/assets/img/characters/${url
-      .split("/people/")[1]
-      .replace("/", "")}.jpg`;
-  }
-
-  onInputChange = inputValue => {
-    this.setState({ inputValue });
-  };
-
-  chosenCharacterDetails(character) {
-    let { peopleOpenedDetail } = this.state;
-    peopleOpenedDetail.push(character.name);
-    this.setState({ character });
-    this.setState({ peopleOpenedDetail });
-    this.setModalVisible(true);
-  }
-
-  handleLoadMore = async () => {
-    let { page, hasMoreCharacters } = this.state;
-    if (hasMoreCharacters) {
-      page++;
-      this.setState({ page });
-      setTimeout(async () => {
-        await this.getAllCharacters();
-      }, 1000);
-    }
   };
 
   renderModal = () => {
