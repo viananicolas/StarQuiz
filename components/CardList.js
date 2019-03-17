@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Button, Card, Icon, Input, Image, Text } from "react-native-elements";
 import { getAllPeople } from "../actions";
+import { Audio } from "expo";
 
 export default class CardList extends React.Component {
   constructor(props) {
@@ -66,7 +67,9 @@ export default class CardList extends React.Component {
       if (distance < 0) {
         clearInterval(x);
         time = "Encerrado";
-        this.setState({ gameEnded: true });
+        let { gameEnded } = this.state;
+        gameEnded = !gameEnded;
+        this.setState({ gameEnded });
       }
       this.setState({ time });
     }, 1000);
@@ -74,7 +77,7 @@ export default class CardList extends React.Component {
   renderCharacters = () => {
     const { people, totalPoints, time, gameEnded } = this.state;
     return (
-      <View>
+      <View style={{ paddingBottom: 100 }}>
         <View
           style={{
             flexDirection: "row",
@@ -131,38 +134,49 @@ export default class CardList extends React.Component {
       </View>
     );
   };
-  getCharacterName(characterName) {
-    let {
-      inputValue,
-      totalPoints,
-      peopleOpenedDetail,
-      peopleCorrectAnswers
-    } = this.state;
-    console.log(inputValue);
-    console.log(characterName);
+  getCharacterName = async characterName => {
+    const soundObject = new Audio.Sound();
+    try {
+      await soundObject.loadAsync(require("../assets/sounds/lightsaber.mp3"));
+      let {
+        inputValue,
+        totalPoints,
+        peopleOpenedDetail,
+        peopleCorrectAnswers
+      } = this.state;
+      console.log(inputValue);
+      console.log(characterName);
 
-    if (
-      inputValue.toLowerCase() === characterName.toLowerCase() &&
-      !peopleCorrectAnswers.includes(characterName)
-    ) {
-      peopleOpenedDetail.includes(characterName)
-        ? (totalPoints += 5)
-        : (totalPoints += 10);
-      peopleCorrectAnswers.push(characterName);
-      this.setState({ totalPoints });
-      this.setState({ peopleCorrectAnswers });
-    } else {
-      Alert.alert("Valor incorreto ou resposta já acertada");
+      if (
+        inputValue.toLowerCase() === characterName.toLowerCase() &&
+        !peopleCorrectAnswers.includes(characterName)
+      ) {
+        peopleOpenedDetail.includes(characterName)
+          ? (totalPoints += 5)
+          : (totalPoints += 10);
+        peopleCorrectAnswers.push(characterName);
+        this.setState({ totalPoints });
+        this.setState({ peopleCorrectAnswers });
+        await soundObject.playAsync();
+      } else {
+        Alert.alert("Valor incorreto ou resposta já acertada");
+      }
+      // Your sound is playing!
+    } catch (error) {
+      // An error occurred!
     }
-  }
+  };
+
   getImage(url) {
     return `https://starwars-visualguide.com/assets/img/characters/${url
       .split("/people/")[1]
       .replace("/", "")}.jpg`;
   }
+
   onInputChange = inputValue => {
     this.setState({ inputValue });
   };
+
   chosenCharacterDetails(character) {
     let { peopleOpenedDetail } = this.state;
     peopleOpenedDetail.push(character.name);
@@ -170,6 +184,7 @@ export default class CardList extends React.Component {
     this.setState({ peopleOpenedDetail });
     this.setModalVisible(true);
   }
+
   handleLoadMore = async () => {
     let { page, hasMoreCharacters } = this.state;
     if (hasMoreCharacters) {
@@ -180,6 +195,7 @@ export default class CardList extends React.Component {
       }, 1000);
     }
   };
+
   renderModal = () => {
     let { character } = this.state;
     return (
@@ -247,7 +263,5 @@ export default class CardList extends React.Component {
   }
 }
 const styles = StyleSheet.create({
-  cardStyle: {
-    height: 100
-  }
+  cardStyle: {}
 });
