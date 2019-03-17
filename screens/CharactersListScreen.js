@@ -26,12 +26,8 @@ export default class CharactersListScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 15,
+    paddingTop: 5,
+    marginBottom: 0,
     backgroundColor: "#fff"
-  },
-  albumMenu: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between"
   }
 });
