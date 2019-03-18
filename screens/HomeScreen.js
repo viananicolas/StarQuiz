@@ -110,9 +110,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4
   },
   getStartedText: {
-    fontSize: 17,
+    fontSize: 47,
     color: "rgba(96,100,109, 1)",
-    lineHeight: 24,
+    lineHeight: 44,
     textAlign: "center"
   },
   tabBarInfoContainer: {
@@ -138,7 +138,8 @@ const styles = StyleSheet.create({
   tabBarInfoText: {
     fontSize: 17,
     color: "rgba(96,100,109, 1)",
-    textAlign: "center"
+    textAlign: "center",
+    marginBottom: 15
   },
   navigationFilename: {
     marginTop: 5

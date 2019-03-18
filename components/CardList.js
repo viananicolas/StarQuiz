@@ -5,10 +5,20 @@ import {
   View,
   Alert,
   Modal,
-  TouchableHighlight
+  TouchableHighlight,
+  KeyboardAvoidingView
 } from "react-native";
-import { Button, Card, Icon, Input, Image, Text } from "react-native-elements";
-import { getAllPeople } from "../actions";
+import {
+  Button,
+  Card,
+  Icon,
+  Input,
+  Image,
+  Text,
+  Overlay,
+  ListItem
+} from "react-native-elements";
+import { getAllPeople, storeData, retrieveData } from "../actions";
 import { Audio } from "expo";
 
 export default class CardList extends React.Component {
@@ -19,6 +29,7 @@ export default class CardList extends React.Component {
       peopleOpenedDetail: [],
       peopleCorrectAnswers: [],
       inputValue: "",
+      emailInputValue: "",
       totalPoints: 0,
       isFetching: false,
       page: 1,
@@ -30,8 +41,8 @@ export default class CardList extends React.Component {
     };
   }
   componentDidMount = async () => {
-    await this.getAllCharacters();
     this.countdown();
+    await this.getAllCharacters();
   };
   getAllCharacters = async () => {
     try {
@@ -54,7 +65,10 @@ export default class CardList extends React.Component {
     return new Date(date.getTime() + minutes * 60000);
   }
   countdown() {
-    var countDownDate = this.addMinutes(new Date(), 2);
+    // var countDownDate = this.addMinutes(new Date(new Date().setSeconds(0,0)), 2);
+    var countDownDate = new Date(
+      new Date().setSeconds(new Date().getSeconds() + 123, 0)
+    );
     var x = setInterval(() => {
       let time = "";
       var now = new Date().getTime();
@@ -64,11 +78,12 @@ export default class CardList extends React.Component {
         -2
       );
       time = minutes + ":" + seconds;
+      console.log(time);
       if (distance < 0) {
         clearInterval(x);
         time = "Encerrado";
         let { gameEnded } = this.state;
-        gameEnded = !gameEnded;
+        gameEnded = true;
         this.setState({ gameEnded });
       }
       this.setState({ time });
@@ -84,8 +99,6 @@ export default class CardList extends React.Component {
         peopleOpenedDetail,
         peopleCorrectAnswers
       } = this.state;
-      console.log(inputValue);
-      console.log(characterName);
 
       if (
         inputValue.toLowerCase() === characterName.toLowerCase() &&
@@ -115,6 +128,9 @@ export default class CardList extends React.Component {
   onInputChange = inputValue => {
     this.setState({ inputValue });
   };
+  onEmailInputChange = emailInputValue => {
+    this.setState({ emailInputValue });
+  };
 
   chosenCharacterDetails(character) {
     let { peopleOpenedDetail } = this.state;
@@ -135,6 +151,30 @@ export default class CardList extends React.Component {
     }
   };
 
+  saveInfo = async () => {
+    try {
+      const { inputValue, emailInputValue, totalPoints } = this.state;
+      if (!inputValue) Alert.alert("Aviso", "Digite o seu nome");
+      else {
+        let user = {
+          name: inputValue,
+          email: emailInputValue,
+          totalPoints: totalPoints
+        };
+        let users = await retrieveData("users");
+        users.push(user);
+        users = await storeData("users", users);
+        console.log(users);
+        if (users) {
+          Alert.alert("Aviso", "Salvo com sucesso.");
+          this.props.navigation.goBack();
+        }
+      }
+    } catch (error) {
+      Alert.alert("Aviso", "Erro ao salvar dados");
+    }
+  };
+
   renderCharacters = () => {
     const { people, totalPoints, time, gameEnded } = this.state;
     return (
@@ -149,48 +189,82 @@ export default class CardList extends React.Component {
           <Text>Tempo: {time}</Text>
           <Text>Pontos: {totalPoints}</Text>
         </View>
-        <FlatList
-          data={people}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item, index }) => {
-            return (
-              <Card key={index} style={styles.cardStyle}>
-                <Image
-                  style={{ height: 450, padding: 0 }}
-                  resizeMode="cover"
-                  source={{ uri: this.getImage(item.url) }}
-                />
-                <Button
-                  icon={<Icon name="code" color="#ffffff" />}
-                  disabled={gameEnded}
-                  backgroundColor="#03A9F4"
-                  buttonStyle={{
-                    borderRadius: 0,
-                    marginLeft: 0,
-                    marginRight: 0,
-                    marginBottom: 0
-                  }}
-                  title="Ver Detalhes"
-                  onPress={() => this.chosenCharacterDetails(item)}
-                />
-                <Input
-                  placeholder="Escreva sua aposta"
-                  editable={!gameEnded}
-                  leftIcon={<Icon name="person" size={24} color="black" />}
-                  onChangeText={inputValue => {
-                    this.onInputChange(inputValue);
-                  }}
-                  // value={this.state.inputValue}
-                  onSubmitEditing={e => {
-                    this.getCharacterName(item.name);
-                  }}
-                />
-              </Card>
-            );
-          }}
-          onEndReached={this.handleLoadMore}
-          onEndThreshold={0}
-        />
+        {!gameEnded && (
+          <FlatList
+            data={people}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => {
+              return (
+                <Card key={index} style={styles.cardStyle}>
+                  <Image
+                    style={{ height: 450, padding: 0 }}
+                    resizeMode="cover"
+                    source={{ uri: this.getImage(item.url) }}
+                  />
+                  <Button
+                    icon={<Icon name="code" color="#ffffff" />}
+                    disabled={gameEnded}
+                    backgroundColor="#03A9F4"
+                    buttonStyle={{
+                      borderRadius: 0,
+                      marginLeft: 0,
+                      marginRight: 0,
+                      marginBottom: 0
+                    }}
+                    title="Ver Detalhes"
+                    onPress={() => this.chosenCharacterDetails(item)}
+                  />
+                  <Input
+                    placeholder="Escreva sua aposta"
+                    editable={!gameEnded}
+                    leftIcon={<Icon name="person" size={24} color="black" />}
+                    onChangeText={inputValue => {
+                      this.onInputChange(inputValue);
+                    }}
+                    // value={this.state.inputValue}
+                    onSubmitEditing={e => {
+                      this.getCharacterName(item.name);
+                    }}
+                  />
+                </Card>
+              );
+            }}
+            onEndReached={this.handleLoadMore}
+            onEndThreshold={0}
+          />
+        )}
+        {gameEnded && (
+          <KeyboardAvoidingView>
+            <Input
+              placeholder="Nome"
+              leftIcon={<Icon name="person" size={24} color="black" />}
+              onChangeText={inputValue => {
+                this.onInputChange(inputValue);
+              }}
+            />
+            <Input
+              placeholder="Email"
+              leftIcon={<Icon name="email" size={24} color="black" />}
+              textContentType="emailAddress"
+              keyboardType="email-address"
+              onChangeText={inputValue => {
+                this.onEmailInputChange(inputValue);
+              }}
+            />
+            <Button
+              icon={<Icon name="save" color="#ffffff" />}
+              backgroundColor="#03A9F4"
+              buttonStyle={{
+                borderRadius: 0,
+                marginLeft: 0,
+                marginRight: 0,
+                marginBottom: 0
+              }}
+              title="Salvar"
+              onPress={() => this.saveInfo()}
+            />
+          </KeyboardAvoidingView>
+        )}
         {this.renderModal()}
       </View>
     );
@@ -199,13 +273,14 @@ export default class CardList extends React.Component {
   renderModal = () => {
     let { character } = this.state;
     return (
-      <Modal
+      <Overlay
         animationType="slide"
         transparent={false}
-        visible={this.state.modalVisible}
+        isVisible={this.state.modalVisible}
         onRequestClose={() => {
           console.log("closed");
         }}
+        onBackdropPress={() => this.setModalVisible(!this.state.modalVisible)}
       >
         <View
           style={{
@@ -219,18 +294,18 @@ export default class CardList extends React.Component {
           }}
         >
           <View
-            style={{
-              width: 300,
-              height: 300
-            }}
+            // style={{
+            //   width: 300,
+            //   height: 300
+            // }}
           >
-            <Text>Altura: {character.height}</Text>
-            <Text>Peso: {character.mass}</Text>
-            <Text>Cor do cabelo: {character.hair_color}</Text>
-            <Text>Cor da pele: {character.skin_color}</Text>
-            <Text>Cor dos olhos: {character.eye_color}</Text>
-            <Text>Ano de Nascimento: {character.birth_year}</Text>
-            <Text>Gênero: {character.gender}</Text>
+            <Text>Height: {character.height}</Text>
+            <Text>Weight: {character.mass}</Text>
+            <Text>Hair color: {character.hair_color}</Text>
+            <Text>Skin color: {character.skin_color}</Text>
+            <Text>Eyes color: {character.eye_color}</Text>
+            <Text>Birth year: {character.birth_year}</Text>
+            <Text>Gender: {character.gender}</Text>
             <TouchableHighlight>
               <Button
                 icon={<Icon name="arrow-back" color="#ffffff" />}
@@ -249,7 +324,7 @@ export default class CardList extends React.Component {
             </TouchableHighlight>
           </View>
         </View>
-      </Modal>
+      </Overlay>
     );
   };
   render() {

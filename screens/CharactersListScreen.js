@@ -14,7 +14,7 @@ export default class CharactersListScreen extends Component {
   renderCharactersView = () => {
     return (
       <ScrollView style={styles.container} contentContainerStyle={{flex: 1}}>
-        <CardList />
+        <CardList navigation={this.props.navigation} />
       </ScrollView>
     );
   };
