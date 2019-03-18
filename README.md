@@ -1,5 +1,5 @@
 # StarQuiz
-Projeto para Invillia
+Projeto para Invillia - React Native
 
 # Ferramentas
 Expo CLI 2.11.9
