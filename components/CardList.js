@@ -61,11 +61,7 @@ export default class CardList extends React.Component {
   setModalVisible(visible) {
     this.setState({ modalVisible: visible });
   }
-  addMinutes(date, minutes) {
-    return new Date(date.getTime() + minutes * 60000);
-  }
   countdown() {
-    // var countDownDate = this.addMinutes(new Date(new Date().setSeconds(0,0)), 2);
     var countDownDate = new Date(
       new Date().setSeconds(new Date().getSeconds() + 123, 0)
     );
@@ -112,7 +108,7 @@ export default class CardList extends React.Component {
         this.setState({ peopleCorrectAnswers });
         await soundObject.playAsync();
       } else {
-        Alert.alert("Valor incorreto ou resposta já acertada");
+        Alert.alert("Incorrect value or character already guessed.");
       }
     } catch (error) {
       console.log(error);
@@ -154,7 +150,7 @@ export default class CardList extends React.Component {
   saveInfo = async () => {
     try {
       const { inputValue, emailInputValue, totalPoints } = this.state;
-      if (!inputValue) Alert.alert("Aviso", "Digite o seu nome");
+      if (!inputValue) Alert.alert("Aviso", "Enter your name");
       else {
         let user = {
           name: inputValue,
@@ -166,12 +162,12 @@ export default class CardList extends React.Component {
         users = await storeData("users", users);
         console.log(users);
         if (users) {
-          Alert.alert("Aviso", "Salvo com sucesso.");
+          Alert.alert("Aviso", "Saved successfully.");
           this.props.navigation.goBack();
         }
       }
     } catch (error) {
-      Alert.alert("Aviso", "Erro ao salvar dados");
+      Alert.alert("Aviso", "Error saving data.");
     }
   };
 
@@ -211,11 +207,11 @@ export default class CardList extends React.Component {
                       marginRight: 0,
                       marginBottom: 0
                     }}
-                    title="Ver Detalhes"
+                    title="Details"
                     onPress={() => this.chosenCharacterDetails(item)}
                   />
                   <Input
-                    placeholder="Escreva sua aposta"
+                    placeholder="Enter your guess"
                     editable={!gameEnded}
                     leftIcon={<Icon name="person" size={24} color="black" />}
                     onChangeText={inputValue => {
@@ -230,13 +226,13 @@ export default class CardList extends React.Component {
               );
             }}
             onEndReached={this.handleLoadMore}
-            onEndThreshold={0}
+            onEndThreshold={100}
           />
         )}
         {gameEnded && (
-          <KeyboardAvoidingView>
+          <KeyboardAvoidingView style={{ padding: 10 }}>
             <Input
-              placeholder="Nome"
+              placeholder="Name"
               leftIcon={<Icon name="person" size={24} color="black" />}
               onChangeText={inputValue => {
                 this.onInputChange(inputValue);
@@ -260,7 +256,7 @@ export default class CardList extends React.Component {
                 marginRight: 0,
                 marginBottom: 0
               }}
-              title="Salvar"
+              title="Save"
               onPress={() => this.saveInfo()}
             />
           </KeyboardAvoidingView>
@@ -280,32 +276,51 @@ export default class CardList extends React.Component {
         onRequestClose={() => {
           console.log("closed");
         }}
+        windowBackgroundColor="rgba(0, 0, 0, .5)"      
+        overlayBackgroundColor="white"
+        width="auto"
+        height={300}
         onBackdropPress={() => this.setModalVisible(!this.state.modalVisible)}
       >
         <View
           style={{
-            marginTop: 22,
+            //marginTop: 22,
             padding: 10,
             alignItems: "center",
             flex: 1,
             flexDirection: "column",
-            justifyContent: "center",
+            //justifyContent: "center",
             alignItems: "center"
           }}
         >
           <View
-            // style={{
-            //   width: 300,
-            //   height: 300
-            // }}
+            style={{
+              width: 350
+              //height: "auto"
+            }}
           >
-            <Text>Height: {character.height}</Text>
-            <Text>Weight: {character.mass}</Text>
-            <Text>Hair color: {character.hair_color}</Text>
-            <Text>Skin color: {character.skin_color}</Text>
-            <Text>Eyes color: {character.eye_color}</Text>
-            <Text>Birth year: {character.birth_year}</Text>
-            <Text>Gender: {character.gender}</Text>
+            <View
+              style={{
+                paddingBottom: 20,
+                alignItems: "center"
+              }}
+            >
+              <Text style={styles.modalText}>Height: {character.height}</Text>
+              <Text style={styles.modalText}>Weight: {character.mass}</Text>
+              <Text style={styles.modalText}>
+                Hair color: {character.hair_color}
+              </Text>
+              <Text style={styles.modalText}>
+                Skin color: {character.skin_color}
+              </Text>
+              <Text style={styles.modalText}>
+                Eyes color: {character.eye_color}
+              </Text>
+              <Text style={styles.modalText}>
+                Birth year: {character.birth_year}
+              </Text>
+              <Text style={styles.modalText}>Gender: {character.gender}</Text>
+            </View>
             <TouchableHighlight>
               <Button
                 icon={<Icon name="arrow-back" color="#ffffff" />}
@@ -316,7 +331,7 @@ export default class CardList extends React.Component {
                   marginRight: 0,
                   marginBottom: 0
                 }}
-                title="Fechar"
+                title="Close"
                 onPress={() => {
                   this.setModalVisible(!this.state.modalVisible);
                 }}
@@ -338,5 +353,8 @@ export default class CardList extends React.Component {
   }
 }
 const styles = StyleSheet.create({
-  cardStyle: {}
+  cardStyle: {},
+  modalText: {
+    fontSize: 25
+  }
 });

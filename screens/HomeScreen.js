@@ -38,8 +38,7 @@ export default class HomeScreen extends React.Component {
           <View style={styles.getStartedContainer}>
             <Text style={styles.getStartedText}>StarQuiz!</Text>
             <Text style={styles.tabBarInfoText}>
-              Veja se você é bom mesmo de Star Wars. Veja os personagens e tente
-              adivinhar quem são!
+              Let's see how good you knowledge in Star Wars is! Scroll through the characters and try to guess their names. May the Force be with you.
             </Text>
           </View>
           <View style={styles.getStartedContainer}>
@@ -49,7 +48,7 @@ export default class HomeScreen extends React.Component {
                 this.props.navigation.navigate("CharactersListScreen");
               }}
             >
-              <Text style={styles.developmentModeText}>Começar</Text>
+              <Text style={styles.developmentModeText}>Start</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
