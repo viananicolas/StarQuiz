@@ -38,7 +38,16 @@ export default class HomeScreen extends React.Component {
           <View style={styles.getStartedContainer}>
             <Text style={styles.getStartedText}>StarQuiz!</Text>
             <Text style={styles.tabBarInfoText}>
-              Let's see how good you knowledge in Star Wars is! Scroll through the characters and try to guess their names. May the Force be with you.
+              Let's see how good you knowledge in Star Wars is! Scroll through
+              the characters and try to guess their names.
+            </Text>
+            <Text style={styles.tabBarInfoText}>
+              You get 10 points if you guess just by looking at their photos.
+              Don't worry, you can look at some tips to help, but you'll get 5
+              points if you guess correctly.
+            </Text>
+            <Text style={styles.tabBarInfoText}>
+              May the Force be with you.
             </Text>
           </View>
           <View style={styles.getStartedContainer}>
@@ -66,15 +75,15 @@ const styles = StyleSheet.create({
     //marginBottom: 20,
     color: "rgba(255,255,255,1.0)",
     fontSize: 30,
-    
-    textAlign: "center",
+
+    textAlign: "center"
   },
   contentContainer: {
     paddingTop: 30
   },
   startContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#2e78b7",
     height: 80,

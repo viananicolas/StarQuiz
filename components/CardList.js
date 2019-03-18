@@ -182,8 +182,8 @@ export default class CardList extends React.Component {
             padding: 20
           }}
         >
-          <Text>Tempo: {time}</Text>
-          <Text>Pontos: {totalPoints}</Text>
+          <Text>Time remaining: {time}</Text>
+          <Text>Total points: {totalPoints}</Text>
         </View>
         {!gameEnded && (
           <FlatList
@@ -207,7 +207,7 @@ export default class CardList extends React.Component {
                       marginRight: 0,
                       marginBottom: 0
                     }}
-                    title="Details"
+                    title="Tips"
                     onPress={() => this.chosenCharacterDetails(item)}
                   />
                   <Input
